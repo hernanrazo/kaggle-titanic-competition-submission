@@ -64,8 +64,11 @@ age_pclass_hist.savefig(graph_folder_path + 'age_pclass_hist.png')
 
 #Start cleaning and preparing data 
 
-#drop the passengerId variable since it's useless
+#drop the passengerId and ticket variable since they're useless
 train_df = train_df.drop(['PassengerId'], axis = 1)
+train_df = train_df.drop(['Ticket'], axis = 1)
+test_df = test_df.drop(['PassengerId'], axis = 1)
+test_df = test_df.drop(['Ticket'], axis = 1)
 
 #add the sibling and parent variables 
 data = [train_df, test_df]
@@ -73,11 +76,69 @@ for i in data:
 	i['relatives'] = i['SibSp'] + i['Parch']
 
 #make pinpoint plot for likelihood of
-#survival and relative number
+#survival based on amount of relatives onboard
 relative_nunber_pinpoint = plt.figure()
 relative_nunber_pinpoint = sns.factorplot('relatives', 'Survived', 
 	data = train_df, aspect = 2.5)
 relative_nunber_pinpoint.savefig(graph_folder_path + 'relative_nunber_pinpoint.png')
+
+#extract all title parts of passenger names
+for i in data:
+	i['Title'] = i.Name.str.extract(' ([A-Za-z]+)\.', expand = False)
+
+print(pd.crosstab(train_df['Title'], train_df['Sex']))
+print(' ')
+
+#replace weird titles with normal ones or place them in a 'rare' category
+for i in data:
+	i['Title'] = i['Title'].replace(['Lady', 'Countess', 'Capt', 'Col',
+		'Don', 'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare')
+
+	i['Title'] = i['Title'].replace('Mlle', 'Miss')
+	i['Title'] = i['Title'].replace('Ms', 'Miss')
+	i['Title'] = i['Title'].replace('Mme', 'Mrs')
+
+print(train_df[['Title', 'Survived']].groupby(['Title'], as_index = False).mean())
+print(' ')
+
+#convert new titles into numerical values
+title_key = {'Mr':1, 'Miss':2, 'Mrs':3, 'Master':4, 'Rare':5}
+for i in data:
+	i['Title'] = i['Title'].map(title_key)
+	i['Title'] = i['Title'].fillna(0)
+
+#drop name variable now that we took what we needed
+train_df = train_df.drop(['Name'], axis = 1)
+test_df = test_df.drop(['Name'], axis = 1)
+
+#make sex variable into numeric values
+sex_key = {'male':0, 'female':1}
+for i in data:
+	i['Sex'] = i['Sex'].map(sex_key)
+
+#make embarked variables into numeric values
+#print frequency table of embarked values
+print(train_df['Embarked'].value_counts())
+print(' ')
+
+#since 'S' is most common, fill the 
+#missing values with this value
+train_df['Embarked'].fillna('S', inplace = True)
+
+#make embarked variables into numeric values
+embarked_key = {'S':0, 'C':1, 'Q':2}
+for i in data:
+	i['Embarked'] = i['Embarked'].map(embarked_key).astype(int)
+
+print(train_df.to_string())
+
+
+
+
+
+
+
+
 
 
 
