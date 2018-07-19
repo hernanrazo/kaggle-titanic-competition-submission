@@ -64,7 +64,7 @@ age_pclass_hist.savefig(graph_folder_path + 'age_pclass_hist.png')
 
 #Start cleaning and preparing data 
 
-#drop the passengerId and ticket variable since they're useless
+#drop the passengerId and ticket variables since they're useless
 train_df = train_df.drop(['PassengerId'], axis = 1)
 train_df = train_df.drop(['Ticket'], axis = 1)
 test_df = test_df.drop(['PassengerId'], axis = 1)
@@ -74,6 +74,13 @@ test_df = test_df.drop(['Ticket'], axis = 1)
 data = [train_df, test_df]
 for i in data:
 	i['relatives'] = i['SibSp'] + i['Parch']
+
+#drop the SibSp and Parch variables now that we took
+#what we needed
+#train_df = train_df.drop(['SibSp'], axis = 1)
+#test_df = test_df.drop(['SibSp'], axis = 1)
+#train_df = train_df.drop(['Parch'], axis = 1)
+#test_df = test_df.drop(['Parch'], axis = 1)
 
 #make pinpoint plot for likelihood of
 #survival based on amount of relatives onboard
@@ -107,16 +114,19 @@ for i in data:
 	i['Title'] = i['Title'].map(title_key)
 	i['Title'] = i['Title'].fillna(0)
 
-#drop name variable now that we took what we needed
+#drop name, SibSp, and Parch variables now that we took what we needed
 train_df = train_df.drop(['Name'], axis = 1)
 test_df = test_df.drop(['Name'], axis = 1)
+train_df = train_df.drop(['SibSp'], axis = 1)
+test_df = test_df.drop(['SibSp'], axis = 1)
+train_df = train_df.drop(['Parch'], axis = 1)
+test_df = test_df.drop(['Parch'], axis = 1)
 
-#make sex variable into numeric values
-sex_key = {'male':0, 'female':1}
-for i in data:
-	i['Sex'] = i['Sex'].map(sex_key)
+#make sex variable into numeric values by 
+#creating new variable called 'Gender'
+train_df['Gender'] = train_df['Sex'].map({'male':0, 'female':1}).astype(int)
+test_df['Gender'] = test_df['Sex'].map({'male':0, 'female':1}).astype(int)
 
-#make embarked variables into numeric values
 #print frequency table of embarked values
 print(train_df['Embarked'].value_counts())
 print(' ')
@@ -124,18 +134,68 @@ print(' ')
 #since 'S' is most common, fill the 
 #missing values with this value
 train_df['Embarked'].fillna('S', inplace = True)
+test_df['Embarked'].fillna('S', inplace = True)
 
 #make embarked variables into numeric values
-embarked_key = {'S':0, 'C':1, 'Q':2}
+train_df['Embark'] = train_df['Embarked'].map({'S':0, 'C':1, 'Q':2})
+test_df['Embark'] = test_df['Embarked'].map({'S':0, 'C':1, 'Q':2})
+
+#drop original Sex and Embarked variables
+train_df = train_df.drop(['Sex'], axis = 1)
+test_df = test_df.drop(['Sex'], axis = 1)
+train_df = train_df.drop(['Embarked'], axis = 1)
+test_df = test_df.drop(['Embarked'], axis = 1)
+
+#fill null values in Age variable by using
+#Gender and pclass correlations. Set empty 
+#cells to the median value of each gender 
+#for each pclass
+guess_ages = np.zeros((2, 3))
+
 for i in data:
-	i['Embarked'] = i['Embarked'].map(embarked_key).astype(int)
+	for j in range(0, 2):
+		for k in range(0, 3):
+			age_guess_df = i[(i['Sex'] == j) & 
+			(i['Pclass'] == k+1)]['Age'].dropna()
 
-print(train_df.to_string())
+			age_guess = age_guess_df.median()
+			guess_ages[j, k] = (age_guess / 0.5 + 0.5) * 0.5
+
+	for j in range(0, 2):
+		for k in range(0, 3):
+			i.loc[(i.Age.isnull()) & (i.Sex == j) & 
+			(i.Pclass == k+1), 'Age'] = guess_ages[j, k]
+
+	i['Age'] = i['Age']
+
+#convert age feature so that passengers within
+#certain ages are group together. Ensure that 
+#all groups are distributed well
+
+for i in data:
+	i['Age'] = i['Age']
+	i.loc[i['Age'] <= 11, 'Age'] = 0
+	i.loc[(i['Age'] > 11) & (i['Age'] <= 18), 'Age'] = 1
+	i.loc[(i['Age'] > 18) & (i['Age'] <= 22), 'Age'] = 2
+	i.loc[(i['Age'] > 22) & (i['Age'] <= 27), 'Age'] = 3
+	i.loc[(i['Age'] > 27) & (i['Age'] <= 33), 'Age'] = 4
+	i.loc[(i['Age'] > 33) & (i['Age'] <= 40), 'Age'] = 5
+	i.loc[(i['Age'] > 40) & (i['Age'] <= 66), 'Age'] = 6
+	i.loc[(i['Age'] > 66), 'Age'] = 6
+	
 
 
 
+print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
 
+#print(train_df)
+
+#print('------------------------------------------------------------------')
+
+
+
+#print(test_df)
 
 
 
