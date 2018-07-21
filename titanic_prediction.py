@@ -75,13 +75,6 @@ data = [train_df, test_df]
 for i in data:
 	i['relatives'] = i['SibSp'] + i['Parch']
 
-#drop the SibSp and Parch variables now that we took
-#what we needed
-#train_df = train_df.drop(['SibSp'], axis = 1)
-#test_df = test_df.drop(['SibSp'], axis = 1)
-#train_df = train_df.drop(['Parch'], axis = 1)
-#test_df = test_df.drop(['Parch'], axis = 1)
-
 #make pinpoint plot for likelihood of
 #survival based on amount of relatives onboard
 relative_nunber_pinpoint = plt.figure()
@@ -150,46 +143,44 @@ test_df = test_df.drop(['Embarked'], axis = 1)
 #Gender and pclass correlations. Set empty 
 #cells to the median value of each gender 
 #for each pclass
-guess_ages = np.zeros((2, 3))
+#guess_ages = np.zeros((2, 3))
 
-for i in data:
-	for j in range(0, 2):
-		for k in range(0, 3):
-			age_guess_df = i[(i['Sex'] == j) & 
-			(i['Pclass'] == k+1)]['Age'].dropna()
+#for dataset in data:
+#	for i in range(0, 2):
+#		for j in range(0, 3):
+#			guess_df = dataset[(dataset['Sex'] == i) & 
+#			(dataset['Pclass'] == j+1)]['Age'].dropna()
+#
+#			age_guess = guess_df.median()
+#			guess_ages[i, j] = (age_guess / 0.5 + 0.5) * 0.5
 
-			age_guess = age_guess_df.median()
-			guess_ages[j, k] = (age_guess / 0.5 + 0.5) * 0.5
+#	for i in range(0, 2):
+#		for j in range(0, 3):
+#			dataset.loc[(dataset.Age.isnull()) & (dataset.Sex == i) & 
+#			(dataset.Pclass == j+1), 'Age'] = guess_ages[i, j]
+#
+#	dataset['Age'] = dataset['Age'].astype(float)
 
-	for j in range(0, 2):
-		for k in range(0, 3):
-			i.loc[(i.Age.isnull()) & (i.Sex == j) & 
-			(i.Pclass == k+1), 'Age'] = guess_ages[j, k]
-
-	i['Age'] = i['Age']
+data['Age'].fillna(data['Age'].mean(), inplace = True)
 
 #convert age feature so that passengers within
-#certain ages are group together. Ensure that 
+#certain ages are grouped together. Ensure that 
 #all groups are distributed well
-
-for i in data:
+for dataset in data:
 	i['Age'] = i['Age']
-	i.loc[i['Age'] <= 11, 'Age'] = 0
-	i.loc[(i['Age'] > 11) & (i['Age'] <= 18), 'Age'] = 1
-	i.loc[(i['Age'] > 18) & (i['Age'] <= 22), 'Age'] = 2
-	i.loc[(i['Age'] > 22) & (i['Age'] <= 27), 'Age'] = 3
-	i.loc[(i['Age'] > 27) & (i['Age'] <= 33), 'Age'] = 4
-	i.loc[(i['Age'] > 33) & (i['Age'] <= 40), 'Age'] = 5
-	i.loc[(i['Age'] > 40) & (i['Age'] <= 66), 'Age'] = 6
-	i.loc[(i['Age'] > 66), 'Age'] = 6
+	dataset.loc[dataset['Age'] <= 11, 'Age'] = 0
+	dataset.loc[(dataset['Age'] > 11) & (dataset['Age'] <= 18), 'Age'] = 1
+	dataset.loc[(dataset['Age'] > 18) & (dataset['Age'] <= 22), 'Age'] = 2
+	dataset.loc[(dataset['Age'] > 22) & (dataset['Age'] <= 27), 'Age'] = 3
+	dataset.loc[(dataset['Age'] > 27) & (dataset['Age'] <= 33), 'Age'] = 4
+	dataset.loc[(dataset['Age'] > 33) & (dataset['Age'] <= 40), 'Age'] = 5
+	dataset.loc[(dataset['Age'] > 40) & (dataset['Age'] <= 66), 'Age'] = 6
+	dataset.loc[(dataset['Age'] > 66), 'Age'] = 6
 	
-
-
-
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
 
-#print(train_df)
+print(train_df)
 
 #print('------------------------------------------------------------------')
 
@@ -197,10 +188,3 @@ print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
 #print(test_df)
 
-
-
-
-
-
-
- 
