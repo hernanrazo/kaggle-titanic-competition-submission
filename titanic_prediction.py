@@ -3,6 +3,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt 
 from matplotlib import style
+from sklearn.ensemble import RandomForestRegressor
 
 #get datasets
 train_df = pd.read_csv('/Users/hernanrazo/pythonProjects/titanic_survival_predictor/train.csv')
@@ -73,14 +74,14 @@ test_df = test_df.drop(['Ticket'], axis = 1)
 #add the sibling and parent variables 
 data = [train_df, test_df]
 for i in data:
-	i['relatives'] = i['SibSp'] + i['Parch']
+	i['Relatives'] = i['SibSp'] + i['Parch']
 
 #make pinpoint plot for likelihood of
 #survival based on amount of relatives onboard
 relative_nunber_pinpoint = plt.figure()
-relative_nunber_pinpoint = sns.factorplot('relatives', 'Survived', 
+relative_nunber_pinpoint = sns.factorplot('Relatives', 'Survived', 
 	data = train_df, aspect = 2.5)
-relative_nunber_pinpoint.savefig(graph_folder_path + 'relative_nunber_pinpoint.png')
+relative_nunber_pinpoint.savefig(graph_folder_path + 'relative_number_pinpoint.png')
 
 #extract all title parts of passenger names
 for i in data:
@@ -139,35 +140,15 @@ test_df = test_df.drop(['Sex'], axis = 1)
 train_df = train_df.drop(['Embarked'], axis = 1)
 test_df = test_df.drop(['Embarked'], axis = 1)
 
-#fill null values in Age variable by using
-#Gender and pclass correlations. Set empty 
-#cells to the median value of each gender 
-#for each pclass
-#guess_ages = np.zeros((2, 3))
-
-#for dataset in data:
-#	for i in range(0, 2):
-#		for j in range(0, 3):
-#			guess_df = dataset[(dataset['Sex'] == i) & 
-#			(dataset['Pclass'] == j+1)]['Age'].dropna()
-#
-#			age_guess = guess_df.median()
-#			guess_ages[i, j] = (age_guess / 0.5 + 0.5) * 0.5
-
-#	for i in range(0, 2):
-#		for j in range(0, 3):
-#			dataset.loc[(dataset.Age.isnull()) & (dataset.Sex == i) & 
-#			(dataset.Pclass == j+1), 'Age'] = guess_ages[i, j]
-#
-#	dataset['Age'] = dataset['Age'].astype(float)
-
-data['Age'].fillna(data['Age'].mean(), inplace = True)
+#fill null values in Age variable
+train_df['Age'].fillna(train_df['Age'].median(), inplace = True)
+test_df['Age'].fillna(test_df['Age'].median(), inplace = True)
 
 #convert age feature so that passengers within
 #certain ages are grouped together. Ensure that 
 #all groups are distributed well
 for dataset in data:
-	i['Age'] = i['Age']
+	dataset['Age'] = dataset['Age'].astype(float)
 	dataset.loc[dataset['Age'] <= 11, 'Age'] = 0
 	dataset.loc[(dataset['Age'] > 11) & (dataset['Age'] <= 18), 'Age'] = 1
 	dataset.loc[(dataset['Age'] > 18) & (dataset['Age'] <= 22), 'Age'] = 2
@@ -179,12 +160,9 @@ for dataset in data:
 	
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
-
 print(train_df)
 
-#print('------------------------------------------------------------------')
+print('------------------------------------------------------------------')
 
-
-
-#print(test_df)
+print(test_df)
 
