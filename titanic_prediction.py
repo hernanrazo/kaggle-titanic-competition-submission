@@ -147,16 +147,26 @@ test_df['Age'].fillna(test_df['Age'].median(), inplace = True)
 #convert age feature so that passengers within
 #certain ages are grouped together. Ensure that 
 #all groups are distributed well
-for dataset in data:
-	dataset['Age'] = dataset['Age'].astype(float)
-	dataset.loc[dataset['Age'] <= 11, 'Age'] = 0
-	dataset.loc[(dataset['Age'] > 11) & (dataset['Age'] <= 18), 'Age'] = 1
-	dataset.loc[(dataset['Age'] > 18) & (dataset['Age'] <= 22), 'Age'] = 2
-	dataset.loc[(dataset['Age'] > 22) & (dataset['Age'] <= 27), 'Age'] = 3
-	dataset.loc[(dataset['Age'] > 27) & (dataset['Age'] <= 33), 'Age'] = 4
-	dataset.loc[(dataset['Age'] > 33) & (dataset['Age'] <= 40), 'Age'] = 5
-	dataset.loc[(dataset['Age'] > 40) & (dataset['Age'] <= 66), 'Age'] = 6
-	dataset.loc[(dataset['Age'] > 66), 'Age'] = 6
+train_df['Age'] = train_df['Age'].astype(int)
+train_df.loc[train_df['Age'] <= 11, 'Age'] = 0
+train_df.loc[(train_df['Age'] > 11) & (train_df['Age'] <= 18), 'Age'] = 1
+train_df.loc[(train_df['Age'] > 18) & (train_df['Age'] <= 22), 'Age'] = 2
+train_df.loc[(train_df['Age'] > 22) & (train_df['Age'] <= 27), 'Age'] = 3
+train_df.loc[(train_df['Age'] > 27) & (train_df['Age'] <= 33), 'Age'] = 4
+train_df.loc[(train_df['Age'] > 33) & (train_df['Age'] <= 40), 'Age'] = 5
+train_df.loc[(train_df['Age'] > 40) & (train_df['Age'] <= 66), 'Age'] = 6
+train_df.loc[(train_df['Age'] > 66), 'Age'] = 6
+
+test_df['Age'] = test_df['Age'].astype(int)
+test_df.loc[test_df['Age'] <= 11, 'Age'] = 0
+test_df.loc[(test_df['Age'] > 11) & (test_df['Age'] <= 18), 'Age'] = 1
+test_df.loc[(test_df['Age'] > 18) & (test_df['Age'] <= 22), 'Age'] = 2
+test_df.loc[(test_df['Age'] > 22) & (test_df['Age'] <= 27), 'Age'] = 3
+test_df.loc[(test_df['Age'] > 27) & (test_df['Age'] <= 33), 'Age'] = 4
+test_df.loc[(test_df['Age'] > 33) & (test_df['Age'] <= 40), 'Age'] = 5
+test_df.loc[(test_df['Age'] > 40) & (test_df['Age'] <= 66), 'Age'] = 6
+test_df.loc[(test_df['Age'] > 66), 'Age'] = 6
+
 	
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
