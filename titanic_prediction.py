@@ -168,6 +168,7 @@ test_df.loc[(test_df['Age'] > 40) & (test_df['Age'] <= 66), 'Age'] = 6
 test_df.loc[(test_df['Age'] > 66), 'Age'] = 6
 
 	
+	
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
 print(train_df)
