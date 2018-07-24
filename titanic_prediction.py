@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt 
 from matplotlib import style
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 
 #get datasets
 train_df = pd.read_csv('/Users/hernanrazo/pythonProjects/titanic_survival_predictor/train.csv')
@@ -44,7 +44,6 @@ fig.savefig(graph_folder_path + 'survival_by_gender_distplot.png')
 facetGrid = sns.FacetGrid(train_df, row = 'Embarked', size = 4.5, aspect = 1.6)
 facetGrid.map(sns.pointplot, 'Pclass', 'Survived', 'Sex', 
 	palette = None, order = None, hue_order = None)
-#facetGrid.fig.suptitle('Survival Based on Gender, Port Embarked, and pclass')
 facetGrid.add_legend()
 facetGrid.savefig(graph_folder_path + 'p_s_s_pointplot.png')
 
@@ -65,13 +64,15 @@ age_pclass_hist.savefig(graph_folder_path + 'age_pclass_hist.png')
 
 #Start cleaning and preparing data 
 
-#drop the passengerId and ticket variables since they're useless
-train_df = train_df.drop(['PassengerId'], axis = 1)
+#drop the ticket and cabin variables since they're useless
 train_df = train_df.drop(['Ticket'], axis = 1)
-test_df = test_df.drop(['PassengerId'], axis = 1)
 test_df = test_df.drop(['Ticket'], axis = 1)
+train_df = train_df.drop(['Cabin'], axis = 1)
+test_df = test_df.drop(['Cabin'], axis = 1)
 
-#add the sibling and parent variables 
+
+#add the sibling and parent variables to create 
+#a new variable that counts in total relatives
 data = [train_df, test_df]
 for i in data:
 	i['Relatives'] = i['SibSp'] + i['Parch']
@@ -108,7 +109,8 @@ for i in data:
 	i['Title'] = i['Title'].map(title_key)
 	i['Title'] = i['Title'].fillna(0)
 
-#drop name, SibSp, and Parch variables now that we took what we needed
+#drop original name, SibSp, and Parch variables now that
+#we took what we needed
 train_df = train_df.drop(['Name'], axis = 1)
 test_df = test_df.drop(['Name'], axis = 1)
 train_df = train_df.drop(['SibSp'], axis = 1)
@@ -120,6 +122,10 @@ test_df = test_df.drop(['Parch'], axis = 1)
 #creating new variable called 'Gender'
 train_df['Gender'] = train_df['Sex'].map({'male':0, 'female':1}).astype(int)
 test_df['Gender'] = test_df['Sex'].map({'male':0, 'female':1}).astype(int)
+
+#drop original sex variable
+train_df = train_df.drop(['Sex'], axis = 1)
+test_df = test_df.drop(['Sex'], axis = 1)
 
 #print frequency table of embarked values
 print(train_df['Embarked'].value_counts())
@@ -134,9 +140,7 @@ test_df['Embarked'].fillna('S', inplace = True)
 train_df['Embark'] = train_df['Embarked'].map({'S':0, 'C':1, 'Q':2})
 test_df['Embark'] = test_df['Embarked'].map({'S':0, 'C':1, 'Q':2})
 
-#drop original Sex and Embarked variables
-train_df = train_df.drop(['Sex'], axis = 1)
-test_df = test_df.drop(['Sex'], axis = 1)
+#drop original Embarked variable
 train_df = train_df.drop(['Embarked'], axis = 1)
 test_df = test_df.drop(['Embarked'], axis = 1)
 
@@ -167,13 +171,71 @@ test_df.loc[(test_df['Age'] > 33) & (test_df['Age'] <= 40), 'Age'] = 5
 test_df.loc[(test_df['Age'] > 40) & (test_df['Age'] <= 66), 'Age'] = 6
 test_df.loc[(test_df['Age'] > 66), 'Age'] = 6
 
-	
-	
+#do the same with fare values
+train_df['Fare'] = train_df['Fare'].astype(int)
+train_df.loc[train_df['Fare'] <= 7.91, 'Fare'] = 0
+train_df.loc[(train_df['Fare'] > 7.91) & (train_df['Fare'] <= 14.454), 'Fare'] = 0
+train_df.loc[(train_df['Fare'] > 14.454) & (train_df['Fare'] <= 31), 'Fare'] = 1
+train_df.loc[(train_df['Fare'] > 31) & (train_df['Fare'] <= 99), 'Fare'] = 2
+train_df.loc[(train_df['Fare'] > 99) & (train_df['Age'] <= 250), 'Fare'] = 3
+train_df.loc[train_df['Fare'] > 250, 'Fare'] = 4
+
+#fill empty cells in the test dataset first 
+test_df['Fare'].fillna(test_df['Fare'].median(), inplace = True)
+
+test_df['Fare'] = test_df['Fare'].astype(int)
+test_df.loc[test_df['Fare'] <= 7.91, 'Fare'] = 0
+test_df.loc[(test_df['Fare'] > 7.91) & (test_df['Fare'] <= 14.454), 'Fare'] = 0
+test_df.loc[(test_df['Fare'] > 14.454) & (test_df['Fare'] <= 31), 'Fare'] = 1
+test_df.loc[(test_df['Fare'] > 31) & (test_df['Fare'] <= 99), 'Fare'] = 2
+test_df.loc[(test_df['Fare'] > 99) & (test_df['Age'] <= 250), 'Fare'] = 3
+test_df.loc[test_df['Fare'] > 250, 'Fare'] = 4
+
+#create new variable that combines age and pclass 
+train_df['Age*Class'] = train_df['Age'] * train_df['Pclass']
+test_df['Age*Class'] = test_df['Age'] * test_df['Pclass']
+
+#create new variable that that calculates fare per person
+train_df['Fare per person'] = train_df['Fare'] /(train_df['Relatives'] +1)
+train_df['Fare per person'] = train_df['Fare per person'].astype(int)
+
+test_df['Fare per person'] = test_df['Fare'] /(test_df['Relatives'] +1)
+test_df['Fare per person'] = test_df['Fare per person'].astype(int)
+
+#double check for any remaining null values
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
+print(' ')
+print(test_df.apply(lambda x: sum(x.isnull()), axis = 0))
 
-print(train_df)
 
-print('------------------------------------------------------------------')
+#all data and variables are accounted for. Start training models
 
-print(test_df)
+#set variables 
+x_train = train_df.drop('Survived', axis = 1)
+y_train = train_df['Survived']
+x_test = test_df.drop('PassengerId', axis = 1).copy()
+
+#use the random forest algorithm
+random_forest = RandomForestClassifier(n_estimators = 100)
+random_forest.fit(x_train, y_train)
+
+y_prediction = random_forest.predict(x_test)
+
+random_forest.score(x_train, y_train)
+acc_random_forest = round(random_forest.score(x_train, y_train) * 100, 2)
+print(round(acc_random_forest, 2,), '%')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
