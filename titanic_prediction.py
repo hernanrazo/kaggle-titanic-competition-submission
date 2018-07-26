@@ -200,13 +200,6 @@ test_df.loc[test_df['Fare'] > 250, 'Fare'] = 4
 train_df['Age*Class'] = train_df['Age'] * train_df['Pclass']
 test_df['Age*Class'] = test_df['Age'] * test_df['Pclass']
 
-#create new variable that that calculates fare per person
-train_df['Fare per person'] = train_df['Fare'] /(train_df['Relatives'] +1)
-train_df['Fare per person'] = train_df['Fare per person'].astype(int)
-
-test_df['Fare per person'] = test_df['Fare'] /(test_df['Relatives'] +1)
-test_df['Fare per person'] = test_df['Fare per person'].astype(int)
-
 #double check for any remaining null values
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 print(' ')
@@ -267,5 +260,3 @@ predictor_var = ['Title', 'Gender', 'Relatives', 'Pclass', 'Age*Class', 'Fare']
 
 print('New model: ')
 classification_model(model, train_df, predictor_var, outcome_var)
-
-
