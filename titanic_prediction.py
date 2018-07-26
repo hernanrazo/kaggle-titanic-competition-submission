@@ -3,6 +3,9 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt 
 from matplotlib import style
+from sklearn import metrics
+from sklearn.cross_validation import KFold
+from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 
 #get datasets
@@ -64,11 +67,13 @@ age_pclass_hist.savefig(graph_folder_path + 'age_pclass_hist.png')
 
 #Start cleaning and preparing data 
 
-#drop the ticket and cabin variables since they're useless
+#drop the ticket, cabin, and passengeId variables since they're useless
 train_df = train_df.drop(['Ticket'], axis = 1)
 test_df = test_df.drop(['Ticket'], axis = 1)
 train_df = train_df.drop(['Cabin'], axis = 1)
 test_df = test_df.drop(['Cabin'], axis = 1)
+train_df = train_df.drop(['PassengerId'], axis = 1)
+test_df = test_df.drop(['PassengerId'], axis = 1)
 
 
 #add the sibling and parent variables to create 
@@ -206,36 +211,61 @@ test_df['Fare per person'] = test_df['Fare per person'].astype(int)
 print(train_df.apply(lambda x: sum(x.isnull()), axis = 0))
 print(' ')
 print(test_df.apply(lambda x: sum(x.isnull()), axis = 0))
-
+print(' ')
 
 #all data and variables are accounted for. Start training models
+def classification_model(model, data, predictors, outcome):
 
-#set variables 
-x_train = train_df.drop('Survived', axis = 1)
-y_train = train_df['Survived']
-x_test = test_df.drop('PassengerId', axis = 1).copy()
+	#fit model and make prediction
+	model.fit(data[predictors], data[outcome])
+	prediction = model.predict(data[predictors])
+	
+	#configure and print accuracy
+	accuracy = metrics.accuracy_score(prediction, data[outcome])
+	print('Accuracy: %s' % '{0:.3%}'.format(accuracy))
+
+	#start k-fold validation
+	kf = KFold(data.shape[0], n_folds = 5, shuffle = False)
+	error = []
+
+	#filter, target, and train the model
+	for train, test in kf:
+		train_predictors = (data[predictors].iloc[train, :])
+		train_target = data[outcome].iloc[train]
+		model.fit(train_predictors, train_target)
+
+		error.append(model.score(data[predictors].iloc[test, :],
+			data[outcome].iloc[test]))
+
+	#print cross-validation value and fit the model again
+	print('Cross-Validation Score: %s' % '{0:.3%}'.format(np.mean(error)))
+	model.fit(data[predictors], data[outcome])
 
 #use the random forest algorithm
-random_forest = RandomForestClassifier(n_estimators = 100)
-random_forest.fit(x_train, y_train)
+outcome_var = 'Survived'
+model = RandomForestClassifier(n_estimators = 100)
+predictor_var = ['Pclass', 'Age', 'Fare', 'Relatives', 'Title', 
+'Gender', 'Embark', 'Age*Class']
 
-y_prediction = random_forest.predict(x_test)
+classification_model(model, train_df, predictor_var, outcome_var)
+print(' ')
 
-random_forest.score(x_train, y_train)
-acc_random_forest = round(random_forest.score(x_train, y_train) * 100, 2)
-print(round(acc_random_forest, 2,), '%')
+#after first training session, accuracy is extremely overfitting to the 
+#training data. To fix this, figure out the most important features of 
+#applicants by taking those with the highest importance matrix
+series = pd.Series(model.feature_importances_, 
+	index = predictor_var).sort_values(ascending = False)
 
+print(series)
+print(' ')
 
+#retrain the model with the top five features
+model = RandomForestClassifier(n_estimators = 25, min_samples_split = 25,
+	max_depth = 7, max_features = 1)
 
+predictor_var = ['Title', 'Gender', 'Relatives', 'Pclass', 'Age*Class', 'Fare']
 
-
-
-
-
-
-
-
-
-
+print('New model: ')
+classification_model(model, train_df, predictor_var, outcome_var)
 
 
