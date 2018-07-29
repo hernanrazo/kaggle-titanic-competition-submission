@@ -1,4 +1,4 @@
-Kaggle Titanic Competition submission
+Kaggle Titanic Competition Submission
 ===
 
 Description
@@ -19,6 +19,14 @@ Next, we make a point plot with the `Pclass`, `Survived`, and `Sex` variables.
 ![p_s_s_pinpoint](https://github.com/hrazo7/kaggle-titanic-competition-submission/blob/master/graphs/p_s_s_pointplot.png)  
 
 This shows that passengers' embarkment port mattered for their survival. This is especially true for women in port Q and S and for men in port C.  
+
+The previous graph shows a strong correlation for Pclass and surival. To further investigate this, let's make a barplot that displays survival rate for each class.  
+
+![pclass_barplot.png](https://github.com/hrazo7/kaggle-titanic-competition-submission/blob/master/graphs/pclass_barplot.png)  
+
+Pclass contributes greatly to survival. We can keep this in mind when training models later on.  
+
+A closer look into Pclass using a plot that seperates by age strengthens our argument and tells us that Pclass 3 was one of the deadlier classes while Pclass 1 was safer.
 
 
 
