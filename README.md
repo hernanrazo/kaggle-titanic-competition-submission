@@ -43,7 +43,7 @@ With this new variable, we can make a pinpoint graph that displays likelihood of
 
 ![relative_number_pinpoint](https://github.com/hrazo7/kaggle-titanic-competition-submission/blob/master/graphs/relative_number_pinpoint.png)  
 
-With this graph we can see that there is a sweetspot at three relatives where one has the highest chance of survival. Anything higher than that drastically lowers chance of survival.  
+With this graph we can see that there is a sweetspot at three relatives where one has the highest chance of survival. Anything higher than that drastically lowers chances of survival.  
 
 Next, we will take passenger names and extract titles. Take the weird titles and place them into the more common titles or into a "rare" group. After that, assign each group a numeric value in order to get a proper format for training.  
 
