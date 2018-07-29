@@ -43,7 +43,7 @@ With this new variable, we can make a pinpoint graph that displays likelihood of
 
 ![relative_number_pinpoint](https://github.com/hrazo7/kaggle-titanic-competition-submission/blob/master/graphs/relative_number_pinpoint.png)  
 
-With this graph we can see that there is a sweetspot at three relatives where one has the highest chance of survival. Anything higer than that drastically lowers chance of survival.  
+With this graph we can see that there is a sweetspot at three relatives where one has the highest chance of survival. Anything higher than that drastically lowers chance of survival.  
 
 Next, we will take passenger names and extract titles. Take the weird titles and place them into the more common titles or into a "rare" group. After that, assign each group a numeric value in order to get a proper format for training.  
 
@@ -73,7 +73,7 @@ train_df['Gender'] = train_df['Sex'].map({'male':0, 'female':1}).astype(int)
 test_df['Gender'] = test_df['Sex'].map({'male':0, 'female':1}).astype(int)
 ```  
 
-For the missing values in `Embark` we can just replace them with the most common port since there are only two missing values. After that, we can assign a numeric value for each port.  
+For the missing values in `Embarked` we can just replace them with the most common port since there are only two missing values. After that, we can assign a numeric value for each port.  
 
 ```python
 train_df['Embarked'].fillna('S', inplace = True)
@@ -127,7 +127,7 @@ test_df.loc[(test_df['Fare'] > 99) & (test_df['Age'] <= 250), 'Fare'] = 3
 test_df.loc[test_df['Fare'] > 250, 'Fare'] = 4
 ```  
 
-Now create a new variable that combines `Age` and `Pclass`:  
+Create a new variable that combines `Age` and `Pclass`:  
 
 ```python
 train_df['Age*Class'] = train_df['Age'] * train_df['Pclass']
