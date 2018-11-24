@@ -3,7 +3,7 @@ Kaggle Titanic Competition Submission
 
 Description
 ---
-A python program that predicts who will survive the sinking of the Titanic. This specific example takes into account the `Pclass`, `Age`, `Fare`, `Relatives`, `Title`, `Gender`, `Embark`, and `Age*Class` variables for each passenger. This problem is part of the [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic) challenge on Kaggle.  
+A python program that predicts who will survive the sinking of the Titanic. This specific example takes into account the `Pclass`, `Age`, `Fare`, `Relatives`, `Title`, `Gender`, `Embark`, and `Age*Class` variables for each passenger. This problem is part of the [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic) challenge on Kaggle. Visit my post on Medium for added information. 
 
 This demo uses the scikit-learn, pandas, numpy, seaborn, and matplotlib libraries. The algorithm used to make the model is the Random Forest algorithm.  
 
@@ -28,6 +28,8 @@ The previous graph shows a strong correlation for Pclass and surival. To further
 Pclass contributes greatly to survival. We can keep this in mind when training models later on.  
 
 A closer look into Pclass using a plot that seperates by age strengthens our argument and tells us that Pclass 3 was one of the deadlier classes while Pclass 1 was safer.  
+
+![age_pclass.png](https://github.com/hrazo7/kaggle-titanic-competition-submission/blob/master/graphs/age_pclass_hist.png)
 
 Now that we have explored the data a little bit, it is time to clean it up and fix null values. To start off we can drop the `Ticket`, `Cabin`, and `passengerId` variables since they don't tell us anything useful.  
 

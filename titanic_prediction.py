@@ -75,7 +75,6 @@ test_df = test_df.drop(['Cabin'], axis = 1)
 train_df = train_df.drop(['PassengerId'], axis = 1)
 test_df = test_df.drop(['PassengerId'], axis = 1)
 
-
 #add the sibling and parent variables to create 
 #a new variable that counts in total relatives
 data = [train_df, test_df]
