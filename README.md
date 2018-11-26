@@ -3,7 +3,7 @@ Kaggle Titanic Competition Submission
 
 Description
 ---
-A python program that predicts who will survive the sinking of the Titanic. This specific example takes into account the `Pclass`, `Age`, `Fare`, `Relatives`, `Title`, `Gender`, `Embark`, and `Age*Class` variables for each passenger. This problem is part of the [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic) challenge on Kaggle. Visit my post on Medium for added information. 
+A python program that predicts who will survive the sinking of the Titanic. This specific example takes into account the `Pclass`, `Age`, `Fare`, `Relatives`, `Title`, `Gender`, `Embark`, and `Age*Class` variables for each passenger. This problem is part of the [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic) challenge on Kaggle. Visit my [post on Medium for added information](https://medium.com/@hernanrazo/kaggle-competition-surviving-the-titanic-disaster-806b4bc3b163). 
 
 This demo uses the scikit-learn, pandas, numpy, seaborn, and matplotlib libraries. The algorithm used to make the model is the Random Forest algorithm.  
 
